@@ -75,10 +75,10 @@ SETUP_COMMANDS: List[Query] = [
     Query(
         id="git_remote",
         interactive=True,
-        default=True,
+        default=False,
         prompt="Adding an existing git remote...\n(You should create the remote from the web UI before proceeding!)",
         command="git remote add origin git@github.com:{{ cookiecutter.github_user }}/{{ cookiecutter.repository_name }}.git",
-        autorun=True,
+        autorun=False,
         dependencies=[
             Dependency(id="git_init", expected=True),
         ],
@@ -97,18 +97,18 @@ SETUP_COMMANDS: List[Query] = [
     Query(
         id="conda_env",
         interactive=True,
-        default=True,
-        prompt="Creating conda environment...",
-        command="conda env create -f env.yaml",
-        autorun=True,
+        default=False,
+        prompt="Creating conda environment with mamba...",
+        command="mamba env create -f env.yaml",
+        autorun=False,
     ),
     Query(
         id="precommit_install",
         interactive=True,
-        default=True,
+        default=False,
         prompt="Installing pre-commits...",
         command="conda run -n {{ cookiecutter.conda_env_name }} pre-commit install",
-        autorun=True,
+        autorun=False,
         dependencies=[
             Dependency(id="git_init", expected=True),
             Dependency(id="conda_env", expected=True),
@@ -117,11 +117,11 @@ SETUP_COMMANDS: List[Query] = [
     Query(
         id="mike_init",
         interactive=True,
-        default=True,
+        default=False,
         prompt="Initializing gh-pages branch for GitHub Pages...",
         command="conda run -n {{ cookiecutter.conda_env_name }} mike deploy --update-aliases 0.0 latest\n"
         "conda run -n {{ cookiecutter.conda_env_name }} mike set-default latest",
-        autorun=True,
+        autorun=False,
         dependencies=[
             Dependency(id="conda_env", expected=True),
             Dependency(id="git_init", expected=True),
@@ -130,10 +130,10 @@ SETUP_COMMANDS: List[Query] = [
     Query(
         id="mike_push",
         interactive=True,
-        default=True,
+        default=False,
         prompt="Pushing 'gh-pages' branch to existing remote...",
         command="git push origin gh-pages",
-        autorun=True,
+        autorun=False,
         dependencies=[
             Dependency(id="mike_init", expected=True),
             Dependency(id="git_remote", expected=True),
@@ -207,15 +207,27 @@ initialize_env_variables()
 setup(setup_commands=SETUP_COMMANDS)
 
 print(
-    "\nYou are all set!\n\n"
+    "\n🎉 Your project has been generated successfully!\n\n"
+    "Next steps:\n"
+    "1. Create your conda environment: mamba env create -f env.yaml\n"
+    "2. Activate the environment: mamba activate {{ cookiecutter.conda_env_name }}\n"
+    "3. Install PyTorch: python install_pytorch.py\n"
+    "4. Install the project in dev mode: pip install -e . --no-deps\n"
+    "5. Install remaining dependencies: pip install lightning torchmetrics hydra-core fastparquet torch_geometric wandb streamlit rich dvc python-dotenv stqdm anypy\n"
+    "6. Install nn-template-core (avoiding old pytorch-lightning): pip install nn-template-core --no-deps\n"
+    "7. Set environment variable (macOS only): export KMP_DUPLICATE_LIB_OK=TRUE\n"
+    "8. Test the installation: python test_installation.py\n"
+    "9. Run the tests: pytest -v\n\n"
+    "Note: PyTorch will be installed with CUDA 12.6 support on Linux and CPU-only on macOS.\n\n"
     "Remember that if you use PyCharm, you must:\n"
     '    - Mark the "src" directory as "Sources Root".\n'
     '    - Enable "Emulate terminal in output console" in the run configuration.\n'
 )
 print(
-    "Remember to:\n"
-    "    - Ensure the GitHub Actions in the repository are enabled.\n"
-    "    - Ensure the Github Pages are enabled to auto-publish the docs on each release."
+    "Optional setup:\n"
+    "    - Create a GitHub repository and add it as remote\n"
+    "    - Enable GitHub Actions in the repository\n"
+    "    - Enable GitHub Pages to auto-publish the docs on each release"
 )
 
-print("Have fun! :]")
+print("\n🚀 Have fun coding! :]")
