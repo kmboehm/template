@@ -122,7 +122,7 @@ def load_hf_dataset(**cfg: DictConfig) -> MetadataDatasetDict:
         train_dataset = load_dataset(
             dataset_params.name,
             split=dataset_params.train_split,
-            token=True,
+            token=False,
         )
         if "val_percentage" in cfg:
             train_val_dataset = train_dataset.train_test_split(test_size=cfg["val_percentage"], shuffle=True)
@@ -132,7 +132,7 @@ def load_hf_dataset(**cfg: DictConfig) -> MetadataDatasetDict:
             val_dataset = load_dataset(
                 dataset_params.name,
                 split=cfg["val_split"],
-                token=True,
+                token=False,
             )
         else:
             raise RuntimeError("Either val_percentage or val_split must be specified in the config.")
@@ -140,7 +140,7 @@ def load_hf_dataset(**cfg: DictConfig) -> MetadataDatasetDict:
         test_dataset = load_dataset(
             dataset_params.name,
             split=dataset_params.test_split,
-            token=True,
+            token=False,
         )
 
         dataset: DatasetDict = MetadataDatasetDict(

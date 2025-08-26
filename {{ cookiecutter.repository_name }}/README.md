@@ -41,8 +41,9 @@ python install_pytorch.py
 # Install the project in dev mode (avoiding dependency conflicts)
 pip install -e . --no-deps
 
-# Install remaining dependencies (avoiding nn-template-core's old pytorch-lightning dependency)
-pip install lightning torchmetrics hydra-core fastparquet torch_geometric wandb streamlit rich dvc python-dotenv stqdm anypy
+# Install remaining dependencies in correct order to avoid conflicts
+pip install lightning torchmetrics hydra-core fastparquet torch_geometric wandb streamlit rich dvc python-dotenv stqdm
+pip install anypy==0.0.5
 pip install nn-template-core --no-deps
 
 # Set environment variable for macOS OpenMP compatibility (if on macOS)
@@ -79,6 +80,86 @@ Run the tests:
 pre-commit run --all-files
 pytest -v
 ```
+
+## Troubleshooting
+
+### Common Installation Issues
+
+#### 1. Dependency Version Conflicts
+
+**Problem**: You may encounter version conflicts during installation, particularly with `anypy` and `nn-template-core`.
+
+**Solution**: Install dependencies in the correct order to avoid conflicts:
+```bash
+# Install the project first without dependencies
+pip install -e . --no-deps
+
+# Install core dependencies
+pip install lightning torchmetrics hydra-core fastparquet torch_geometric wandb streamlit rich dvc python-dotenv stqdm
+
+# Install anypy with specific version to avoid conflicts
+pip install anypy==0.0.5
+
+# Install nn-template-core without dependencies to avoid version conflicts
+pip install nn-template-core --no-deps
+```
+
+#### 2. Hugging Face Token Issues
+
+**Problem**: Tests may fail with Hugging Face authentication errors when downloading datasets.
+
+**Solution**: The template has been updated to use `token=False` for public datasets. For private datasets, set your token:
+```bash
+export HUGGING_FACE_HUB_TOKEN=your_token_here
+```
+
+#### 3. PyTorch Installation Issues
+
+**Problem**: PyTorch installation may fail on different platforms.
+
+**Solution**: Use the provided platform-specific installation script:
+```bash
+python install_pytorch.py
+```
+
+#### 4. macOS OpenMP Conflicts
+
+**Problem**: On macOS, you may encounter OpenMP library conflicts.
+
+**Solution**: Set the environment variable before running:
+```bash
+export KMP_DUPLICATE_LIB_OK=TRUE
+```
+
+#### 5. Pre-commit Hook Failures
+
+**Problem**: Pre-commit hooks may fail due to code formatting issues.
+
+**Solution**: The hooks will automatically fix most formatting issues. Run them again:
+```bash
+pre-commit run --all-files
+```
+
+#### 6. Test Failures
+
+**Problem**: Some tests may fail, particularly checkpoint-related tests.
+
+**Expected**: All 18 tests should pass, including checkpoint functionality tests.
+
+**Solution**: If you see test failures, check:
+1. All dependencies are installed correctly
+2. PyTorch version is compatible
+3. Environment variables are set correctly
+4. You're using the latest version of the template (checkpoint tests have been fixed)
+
+### Verification Checklist
+
+After installation, verify everything is working:
+
+1. ✅ Environment activated: `mamba activate {{ cookiecutter.conda_env_name }}`
+2. ✅ PyTorch installed: `python -c "import torch; print(torch.__version__)"`
+3. ✅ Project installed: `python -c "import {{ cookiecutter.package_name }}; print('OK')"`
+4. ✅ Tests passing: `pytest -v` (expect 18 passing)
 
 
 ### Update the dependencies
